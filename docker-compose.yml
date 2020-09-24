@@ -1,0 +1,47 @@
+version: "3"
+services:
+  client:                 
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./Frontend 
+    volumes:
+      - ./client/:/app      
+      - /app/node_modules  
+    networks:
+      - backend           
+  server:                          
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./Backend    
+    volumes:
+      - ./server/:/app      
+      - /app/node_modules      
+    environment:
+      - NODE_PATH=src
+      - PORT=4000
+      - DB_HOST=mongo
+      - DB=test
+    networks:
+      - backend  
+    depends_on:
+      - mongo
+    ports:
+      - "4000:4000"   
+  mongo:
+    container_name: mongo
+    image: mongo
+    volumes:
+      - data:/data/db
+    ports:
+      - "27017:27017" 
+    networks:
+      - backend
+
+
+networks: 
+  backend:
+    driver: bridge
+
+volumes:
+  data:
+    driver: local  
